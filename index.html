@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amen JOUINI - Software Engineer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e7eb;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+        .section-card {
+            background-color: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #00aaff, 0 0 10px #00aaff, 0 0 20px #00aaff, 0 0 40px #00aaff, 0 0 80px #00aaff;
+        }
+        .skill-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
+        }
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #00aaff;
+            border: 4px solid #0a0a0a;
+            box-shadow: 0 0 10px #00aaff;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="header">
+        <div class="container mx-auto px-6 py-4">
+            <nav class="flex items-center justify-between">
+                <a href="#" class="text-2xl font-bold tracking-wider neon-text">AJ</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors">About</a>
+                    <a href="#skills" class="text-gray-300 hover:text-cyan-400 transition-colors">Skills</a>
+                    <a href="#projects" class="text-gray-300 hover:text-cyan-400 transition-colors">Projects</a>
+                    <a href="#experience" class="text-gray-300 hover:text-cyan-400 transition-colors">Experience</a>
+                    <a href="#contact" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/20">Contact</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-300 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-black/50 backdrop-blur-xl">
+            <a href="#about" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">About</a>
+            <a href="#skills" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Skills</a>
+            <a href="#projects" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Projects</a>
+            <a href="#experience" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Experience</a>
+            <a href="#contact" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Contact</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 pt-24">
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex items-center">
+            <div class="text-center md:text-left w-full">
+                <h1 class="text-5xl md:text-7xl font-black uppercase tracking-widest mb-4">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Amen JOUINI</span>
+                </h1>
+                <h2 class="text-2xl md:text-4xl font-light text-gray-300 mb-8">Software Engineer & IT Architect</h2>
+                <p class="max-w-2xl mx-auto md:mx-0 text-gray-400 mb-0">
+                    Crafting elegant, high-performance digital solutions from concept to deployment. 
+                    </p>
+                <p class="max-w-2xl mx-auto md:mx-0 text-gray-400 mb-10">
+                    I turn your ideas into beautiful, intuitive software solutions.
+                </p>
+                <a href="#projects" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30">
+                    View My Work
+                </a>
+            </div>
+        </section>
+
+        <!-- About Me -->
+        <section id="about" class="py-20">
+            <div class="section-card p-8 md:p-12 rounded-2xl">
+                <h3 class="text-3xl font-bold mb-6 text-center text-cyan-400">About Me</h3>
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/3">
+                        <img src="./aj.png" alt="Amen JOUINI" class="rounded-full w-48 h-48 md:w-64 md:h-64 mx-auto border-4 border-cyan-500/50 shadow-lg shadow-cyan-500/20">
+                    </div>
+                    <div class="w-full md:w-2/3 text-white text-lg">
+                        <p class="mb-4 ">
+                            <strong class="text-cyan-400">Amen Jouini</strong>, a software engineer with a strong background in 
+                            <strong>SaaS development</strong>, <strong>web applications</strong>, and 
+                            <strong>data analytics</strong>. I earned my Engineering degree in Software Engineering, 
+                            recognized under European standards (<strong>EUR-ACE and CTI</strong>), and complemented it with 
+                            multiple internships that gave me practical, hands-on experience. 
+                        </p>
+
+                        <p class="mb-4">
+                            Over the past few years, I have worked <strong> freelance with national and international companies,</strong> 
+                            delivering high-impact projects. On a national level, I created <strong>Tunisia’s first bulletproof 
+                            car brand website's </strong> and contributed to the <strong> first Tunisian startup creating a SaaS platform for sports academy management, </strong>
+                            featuring an AI mental health chatbot, livestream, and Power BI for accounting—already used by <strong> Club Africain, 
+                            one of Tunisia’s top clubs.</strong> while we gained clients on the international level such as <strong>Senegal, Libya, Morocco, UAE</strong>
+                            I have also created Saudi Arabian hotel agency web application management system to help them with booking and managing visitors and staff. 
+                            
+                        </p>
+                        <p>
+I thrive at the intersection of innovation 
+                            and real-world impact, building solutions that combine cutting-edge technology with tangible results for clients across industries.                       
+                         </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills -->
+        <section id="skills" class="py-20">
+            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Technical Skills</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- Skill Example -->
+                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./js.png"></img>
+                    <span class="font-semibold">JavaScript</span>
+                </div>
+                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./ts.png"></img>
+                    <span class="font-semibold">TypeScript</span>
+                </div>
+                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./React.png"></img>
+                    <span class="font-semibold">React</span>
+                </div>
+                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./Node.png"></img>
+                    <span class="font-semibold">Node.js</span>
+                </div>
+                 <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./MySQL.png"></img>
+                    <span class="font-semibold">MySQL</span>
+                </div>
+                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
+                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./mongo.png"></img>
+                    <span class="font-semibold">MongoDB</span>
+                </div>
+                <!-- Add more skills as needed -->
+            </div>
+             <p class="text-2xl font-bold mb-12 mt-10 text-center text-cyan-400">And more...</p>
+        </section>
+
+        <!-- Projects -->
+        <section id="projects" class="py-20">
+            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Freelance Projects</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project Example 1 -->
+                <div class="project-card section-card rounded-lg overflow-hidden group">
+                    <div class="relative">
+                        <video src="./pfe.mp4" class="w-full h-60 object-cover" controls>
+                    </div>
+                    <div class="p-6">
+                        <h4 class="text-xl font-bold mb-2 text-white">Sports Management Software</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Angular</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">SpringBoot</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Mysql</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Node.js</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Express.js</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">RedisDB</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">LiveStreaming</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">AI Chatbot</span>
+                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Power BI</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project Example 2 -->
+         <div class="project-card section-card rounded-lg overflow-hidden group">
+  <div class="relative">
+    <!-- Website Preview -->
+    <iframe 
+      src="https://hamilcar.tn" 
+      class="w-full h-60 object-cover"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-popups"
+    ></iframe>
+
+  </div>
+
+        <div class="p-6">
+        <h4 class="text-xl font-bold mb-2 text-white">
+        <a href="https://hamilcar.tn" target="_blank" rel="noopener noreferrer" class="hover:underline">
+            Bullet Proof Car Website
+        </a>
+        </h4>
+            <div class="flex flex-wrap gap-2">
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">CSS</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">JavaScript</span>
+            </div>
+        </div>
+        </div>
+
+                <!-- Project Example 3 -->
+                <div class="project-card section-card rounded-lg overflow-hidden group">
+  <div class="relative">
+    <!-- Website Preview -->
+    <iframe 
+      src="https://smrpharmaplus.com" 
+      class="w-full h-60 object-cover"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-popups"
+    ></iframe>
+
+  </div>
+
+        <div class="p-6">
+        <h4 class="text-xl font-bold mb-2 text-white">
+        <a href="https://smrpharmaplus.com" target="_blank" rel="noopener noreferrer" class="hover:underline">
+            Pharmaceutical Laboratory Website
+        </a>
+        </h4>
+            <div class="flex flex-wrap gap-2">
+          <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">CSS</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">JavaScript</span>
+            </div>
+        </div>
+        </div>
+
+        <!-- project 4 -->
+         <div class="project-card section-card rounded-lg overflow-hidden group">
+  <div class="relative">
+    <!-- Website Preview -->
+    <iframe 
+      src="https://vehtun-web.vercel.app" 
+      class="w-full h-60 object-cover"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-popups"
+    ></iframe>
+
+  </div>
+
+        <div class="p-6">
+        <h4 class="text-xl font-bold mb-2 text-white">
+        <a href="https://vehtun-web.vercel.app" target="_blank" rel="noopener noreferrer" class="hover:underline">
+            Pharmaceutical Laboratory Website
+        </a>
+        </h4>
+            <div class="flex flex-wrap gap-2">
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">React</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">TypeScript</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
+            </div>
+        </div>
+        </div>
+
+ <!-- project 5 -->
+         <div class="project-card section-card rounded-lg overflow-hidden group">
+  <div class="relative">
+    <!-- Website Preview -->
+    <iframe 
+      src="https://ideal-bookings.com/" 
+      class="w-full h-60 object-cover"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-popups"
+    ></iframe>
+
+  </div>
+
+        <div class="p-6">
+        <h4 class="text-xl font-bold mb-2 text-white">
+        <a href="https://ideal-bookings.com/" target="_blank" rel="noopener noreferrer" class="hover:underline">
+            Pharmaceutical Laboratory Website
+        </a>
+        </h4>
+            <div class="flex flex-wrap gap-2">
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">NextJS</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Node.js</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Express.js</span>
+            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">MySQL</span>
+            </div>
+        </div>
+        </div>
+
+        </section>
+
+        <!-- Experience -->
+        <section id="experience" class="py-20">
+            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Experience</h3>
+            <div class="relative max-w-2xl mx-auto">
+                <div class="absolute left-0 top-0 h-full w-0.5 bg-cyan-500/30"></div>
+                <!-- Experience Item 1 -->
+                <div class="timeline-item relative pl-8 mb-12">
+                    <h4 class="font-bold text-xl text-white">Freelance Developer</h4>
+                    <p class="text-cyan-400 font-medium mb-2">Self-Employed | Dec 2024 - Present</p>
+                    <p class="text-gray-400">
+                        Designed and developed full-stack applications for various clients, focusing on performance, scalability, and modern UI/UX. Managed projects from initial consultation to final deployment and maintenance.
+                    </p>
+                </div>
+                <!-- Experience Item 2 -->
+                <div class="timeline-item relative pl-8 mb-12">
+                    <h4 class="font-bold text-xl text-white">Freelance Developer</h4>
+                    <p class="text-cyan-400 font-medium mb-2">Ideal Bookings | Sept 2024 - Dec 2024</p>
+                    <p class="text-gray-400">
+                    Developed a comprehensive web application for a Saudi Arabian hotel agency, enabling seamless booking management, visitor coordination, and staff operations.                    </p>
+                </div>
+                <!-- Experience Item 3 -->
+                <div class="timeline-item relative pl-8">
+                    <h4 class="font-bold text-xl text-white">Software Engineer Intern</h4>
+                    <p class="text-cyan-400 font-medium mb-2">GARK | Feb 2024 - Aug 2024</p>
+                    <p class="text-gray-400">
+                    Contributed to the first Tunisian startup creating a SaaS platform for sports academy management,
+                            featuring an AI mental health chatbot, livestream, and Power BI for accounting                
+                </div>
+            </div>
+        </section>
+
+      <!-- ✅ Contact Form -->
+         <section id="contact" class="py-20">
+             <div class="section-card p-8 md:p-12 rounded-2xl max-w-3xl mx-auto">
+                <h3 class="text-3xl font-bold mb-2 text-center text-cyan-400">Get In Touch</h3>
+                <p class="text-center text-gray-400 mb-8">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
+<form id="cta-form" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="access_key" value="251a6a2b-26a2-4836-8ea9-602372e5968c">
+
+  <div class="mb-6">
+    <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Your Name</label>
+    <input type="text" id="name" name="name" required
+      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
+      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5">
+  </div>
+  <div class="mb-6">
+    <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Your Email</label>
+    <input type="email" id="email" name="email" required
+      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
+      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5">
+  </div>
+  <div class="mb-6">
+    <label for="message" class="block mb-2 text-sm font-medium text-gray-300">Message</label>
+    <textarea id="message" name="message" rows="4" required
+      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
+      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5"></textarea>
+  </div>
+  <div class="text-center">
+    <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 
+      hover:to-blue-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 
+      transform hover:scale-105 shadow-lg shadow-cyan-500/30">
+      Send Message
+    </button>
+  </div>
+</form>
+ </div>
+        </section>
+<!-- ✅ Modal -->
+<div id="modal-overlay" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center">
+  <div class="bg-gray-900 p-8 rounded-xl shadow-lg max-w-sm w-full text-center relative">
+    <button id="close-modal-btn" class="absolute top-2 right-4 text-white text-2xl">&times;</button>
+    <div class="mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+        stroke="green" class="w-12 h-12 mx-auto">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2l4-4m6 2a9 9 0 11-18 0a9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <h3 class="text-xl font-bold text-green-400">Success!</h3>
+    <p class="text-gray-300 mt-2">Your message has been sent successfully.<br />We'll be in touch shortly.</p>
+  </div>
+</div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-cyan-500/20 mt-20">
+        <div class="container mx-auto px-6 py-6 text-center text-gray-500">
+            <p>&copy; 2025 Amen JOUINI. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Background Animation with Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const particlesGeometry = new THREE.BufferGeometry;
+        const particlesCount = 5000;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 5;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.005,
+            color: 0x00aaff
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+        camera.position.z = 2;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        const clock = new THREE.Clock();
+        const animate = () => {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            particlesMesh.rotation.y = -0.1 * elapsedTime;
+            if (mouseX > 0) {
+                particlesMesh.rotation.x = -mouseY * (elapsedTime * 0.00008);
+                particlesMesh.rotation.y = -mouseX * (elapsedTime * 0.00008);
+            }
+            renderer.render(scene, camera);
+        };
+        animate();
+
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('bg-black/50', 'backdrop-blur-xl', 'shadow-lg');
+            } else {
+                header.classList.remove('bg-black/50', 'backdrop-blur-xl', 'shadow-lg');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu on link click
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+        const modalOverlay = document.getElementById("modal-overlay");
+  const closeModalBtn = document.getElementById("close-modal-btn");
+  const form = document.getElementById("cta-form");
+
+  function showSuccessModal() {
+    modalOverlay.classList.remove("hidden");
+  }
+  function hideSuccessModal() {
+    modalOverlay.classList.add("hidden");
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", hideSuccessModal);
+  }
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) hideSuccessModal();
+    });
+  }
+
+  // ✅ Handle Form Submit
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: "POST",
+      body: formData,
+      headers: { Accept: "application/json" }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Form submit failed");
+      showSuccessModal();
+      form.reset();
+    })
+    .catch(() => alert("Something went wrong. Please try again."));
+  });
+
+
+    </script>
+</body>
+</html>

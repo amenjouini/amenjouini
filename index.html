@@ -1,518 +1,1085 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Amen JOUINI - Software Engineer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0a0a0a;
-            color: #e5e7eb;
-        }
-        #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.15;
-        }
-        .section-card {
-            background-color: rgba(17, 17, 17, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .neon-text {
-            text-shadow: 0 0 5px #00aaff, 0 0 10px #00aaff, 0 0 20px #00aaff, 0 0 40px #00aaff, 0 0 80px #00aaff;
-        }
-        .skill-card:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 0 15px rgba(0, 170, 255, 0.5);
-        }
-        .project-card:hover .project-overlay {
-            opacity: 1;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #00aaff;
-            border: 4px solid #0a0a0a;
-            box-shadow: 0 0 10px #00aaff;
-        }
-    </style>
-</head>
-<body class="antialiased">
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0a0a0a;
+        color: #e5e7eb;
+        overflow-x: hidden; /* Prevent horizontal scrollbar from animations */
+      }
+      #bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.2; /* Slightly increased opacity */
+      }
+      .section-card {
+        background-color: rgba(17, 17, 17, 0.7); /* Slightly more transparent */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .section-card:hover {
+        box-shadow: 0 0 25px rgba(0, 170, 255, 0.2);
+      }
+      .neon-text {
+        text-shadow: 0 0 5px #67e8f9, 0 0 10px #67e8f9, 0 0 20px #22d3ee,
+          0 0 40px #22d3ee;
+      }
+      .skill-card:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.5); /* Changed glow to a new accent color */
+      }
+      .project-card:hover .project-overlay {
+        opacity: 1;
+      }
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -30px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #67e8f9;
+        border: 4px solid #0a0a0a;
+        box-shadow: 0 0 15px #67e8f9;
+      }
 
+      /* -- New Animation Styles -- */
+      .animated-gradient {
+        background-size: 200% 200%;
+        animation: gradient-animation 5s ease infinite;
+      }
+
+      @keyframes gradient-animation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* For the typing effect cursor */
+      .typing-cursor {
+        display: inline-block;
+        width: 3px;
+        height: 2.5rem; /* Match text size */
+        background-color: #67e8f9;
+        margin-left: 8px;
+        animation: blink 0.7s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* For scroll animations */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body class="antialiased">
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="header">
-        <div class="container mx-auto px-6 py-4">
-            <nav class="flex items-center justify-between">
-                <a href="#" class="text-2xl font-bold tracking-wider neon-text">AJ</a>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors">About</a>
-                    <a href="#skills" class="text-gray-300 hover:text-cyan-400 transition-colors">Skills</a>
-                    <a href="#projects" class="text-gray-300 hover:text-cyan-400 transition-colors">Projects</a>
-                    <a href="#experience" class="text-gray-300 hover:text-cyan-400 transition-colors">Experience</a>
-                    <a href="#contact" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/20">Contact</a>
-                </div>
-                <button id="mobile-menu-button" class="md:hidden text-gray-300 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </nav>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-black/50 backdrop-blur-xl">
-            <a href="#about" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">About</a>
-            <a href="#skills" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Skills</a>
-            <a href="#projects" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Projects</a>
-            <a href="#experience" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Experience</a>
-            <a href="#contact" class="block py-2 px-4 text-sm text-gray-300 hover:bg-cyan-900/50">Contact</a>
-        </div>
+    <header
+      class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      id="header"
+    >
+      <div class="container mx-auto px-6 py-4">
+        <nav class="flex items-center justify-between">
+          <a href="#" class="text-2xl font-bold tracking-wider neon-text">AJ</a>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="#about"
+              class="text-gray-300 hover:text-cyan-300 transition-colors"
+              >About</a
+            >
+            <a
+              href="#skills"
+              class="text-gray-300 hover:text-cyan-300 transition-colors"
+              >Skills</a
+            >
+            <a
+              href="#projects"
+              class="text-gray-300 hover:text-cyan-300 transition-colors"
+              >Projects</a
+            >
+            <a
+              href="#experience"
+              class="text-gray-300 hover:text-cyan-300 transition-colors"
+              >Experience</a
+            >
+            <a
+              href="#contact"
+              class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-2 px-4 rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-400/50 transform hover:scale-105"
+              >Contact</a
+            >
+          </div>
+          <button
+            id="mobile-menu-button"
+            class="md:hidden text-gray-300 focus:outline-none"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </nav>
+      </div>
+      <div
+        id="mobile-menu"
+        class="hidden md:hidden bg-black/70 backdrop-blur-xl"
+      >
+        <a
+          href="#about"
+          class="block py-3 px-4 text-sm text-gray-300 hover:bg-cyan-900/50"
+          >About</a
+        >
+        <a
+          href="#skills"
+          class="block py-3 px-4 text-sm text-gray-300 hover:bg-cyan-900/50"
+          >Skills</a
+        >
+        <a
+          href="#projects"
+          class="block py-3 px-4 text-sm text-gray-300 hover:bg-cyan-900/50"
+          >Projects</a
+        >
+        <a
+          href="#experience"
+          class="block py-3 px-4 text-sm text-gray-300 hover:bg-cyan-900/50"
+          >Experience</a
+        >
+        <a
+          href="#contact"
+          class="block py-3 px-4 text-sm text-gray-300 hover:bg-cyan-900/50"
+          >Contact</a
+        >
+      </div>
     </header>
 
     <main class="container mx-auto px-6 pt-24">
-        <!-- Hero Section -->
-        <section id="hero" class="min-h-screen flex items-center">
-            <div class="text-center md:text-left w-full">
-                <h1 class="text-5xl md:text-7xl font-black uppercase tracking-widest mb-4">
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Amen JOUINI</span>
-                </h1>
-                <h2 class="text-2xl md:text-4xl font-light text-gray-300 mb-8">Software Engineer & IT Architect</h2>
-                <p class="max-w-2xl mx-auto md:mx-0 text-gray-400 mb-0">
-                    Crafting elegant, high-performance digital solutions from concept to deployment. 
+      <section id="hero" class="min-h-screen flex items-center">
+        <div class="text-center md:text-left w-full">
+          <div class="reveal">
+            <h1
+              class="text-5xl md:text-7xl font-black uppercase tracking-widest mb-4 animated-gradient"
+            >
+              <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600"
+                >Amen JOUINI</span
+              >
+            </h1>
+          </div>
+          <div class="reveal" style="transition-delay: 200ms">
+            <h2 class="text-2xl md:text-4xl font-light text-gray-300 mb-8 h-10">
+              <span id="typing-effect"></span
+              ><span class="typing-cursor"></span>
+            </h2>
+          </div>
+          <div class="reveal" style="transition-delay: 400ms">
+            <p class="max-w-2xl mx-auto md:mx-0 text-white-400">
+              Crafting elegant, high-performance digital solutions from concept
+              to deployment.
+            </p>
+
+            <p class="max-w-2xl mx-auto md:mx-0 text-white-400 mb-10">
+              <strong
+                >I turn your ideas into real, intuitive software
+                solutions.</strong
+              >
+            </p>
+          </div>
+          <div class="reveal" style="transition-delay: 600ms">
+            <a
+              href="#projects"
+              class="animated-gradient bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30 hover:shadow-blue-500/40"
+            >
+              View My Work
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" class="py-20">
+        <div class="section-card p-8 md:p-12 rounded-2xl reveal">
+          <div class="flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/3">
+              <img
+                src="./aj.png"
+                alt="Amen JOUINI"
+                class="rounded-full w-48 h-48 md:w-64 md:h-64 mx-auto border-4 border-cyan-500/50 shadow-lg shadow-cyan-500/20"
+              />
+            </div>
+            <div class="w-full md:w-2/3 text-white">
+              <h3
+                class="text-3xl md:text-4xl font-bold mb-2 text-center md:text-left animated-gradient"
+              >
+                <span
+                  class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600"
+                >
+                  About Me
+                </span>
+              </h3>
+              <p class="text-gray-400 mb-8 text-center md:text-left">
+                From Tunisian Roots to Global Impact.
+              </p>
+
+              <p class="mb-6 text-lg text-left md:text-justify">
+                I'm <strong class="text-cyan-400">Amen Jouini</strong>, a
+                results-driven software engineer passionate about building
+                high-impact digital solutions. My approach combines technical
+                expertise with a focus on creating practical, user-centric
+                applications.
+              </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                <div
+                  class="flex items-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-white/10"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8 text-cyan-400 flex-shrink-0 mt-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                    />
+                  </svg>
+                  <div>
+                    <h4 class="font-bold text-white">Core Expertise</h4>
+                    <p class="text-gray-400">
+                      SaaS Development, Web Applications, and Data Analytics.
                     </p>
-                <p class="max-w-2xl mx-auto md:mx-0 text-gray-400 mb-10">
-                    I turn your ideas into beautiful, intuitive software solutions.
-                </p>
-                <a href="#projects" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30">
-                    View My Work
+                  </div>
+                </div>
+                <div
+                  class="flex items-start gap-4 p-4 bg-gray-900/50 rounded-lg border border-white/10"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8 text-cyan-400 flex-shrink-0 mt-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path
+                      d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-5.998 12.078 12.078 0 01.665-6.479L12 14z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-5.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20M1 12l5.373 2.986L12 17.5l5.627-2.514L23 12"
+                    />
+                  </svg>
+                  <div>
+                    <h4 class="font-bold text-white">Certified Education</h4>
+                    <p class="text-gray-400">
+                      European-accredited (EUR-ACE & CTI) Engineering Degree.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <h4 class="text-xl font-bold text-white mb-4">
+                Notable Achievements
+              </h4>
+              <ul class="space-y-3 list-inside list-disc text-lg text-gray-300">
+                <li class="marker:text-cyan-400">
+                  Developed
+                  <strong class="text-white"
+                    >Tunisia’s first bulletproof car brand website</strong
+                  >, establishing a premier online presence for a high-security
+                  client.
+                </li>
+                <li class="marker:text-cyan-400">
+                  Co-engineered a
+                  <strong class="text-white"
+                    >SaaS platform for sports academy management</strong
+                  >, now used by top-tier clients like
+                  <strong class="text-white">Club Africain</strong>.
+Expended internationally in
+                  
+                                    <strong class="text-white"
+                    >
+                  Senegal, Libya, Morocco, UAE</strong
+                </li>
+                <li class="marker:text-cyan-400">
+                  Delivered a full-stack
+                  <strong class="text-white">hotel management system</strong>
+                  for a Saudi Arabian agency, streamlining their booking and
+                  operational workflow.
+                </li>
+               
+              </ul>
+
+              <div class="mt-8 text-center md:text-left">
+                <a
+                  href="#"
+                  class="bg-gray-800 hover:bg-gray-700 border border-cyan-500/50 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  Download CV
                 </a>
+              </div>
             </div>
-        </section>
-
-        <!-- About Me -->
-        <section id="about" class="py-20">
-            <div class="section-card p-8 md:p-12 rounded-2xl">
-                <h3 class="text-3xl font-bold mb-6 text-center text-cyan-400">About Me</h3>
-                <div class="flex flex-col md:flex-row items-center gap-12">
-                    <div class="w-full md:w-1/3">
-                        <img src="./aj.png" alt="Amen JOUINI" class="rounded-full w-48 h-48 md:w-64 md:h-64 mx-auto border-4 border-cyan-500/50 shadow-lg shadow-cyan-500/20">
-                    </div>
-                    <div class="w-full md:w-2/3 text-white text-lg">
-                        <p class="mb-4 ">
-                            <strong class="text-cyan-400">Amen Jouini</strong>, a software engineer with a strong background in 
-                            <strong>SaaS development</strong>, <strong>web applications</strong>, and 
-                            <strong>data analytics</strong>. I earned my Engineering degree in Software Engineering, 
-                            recognized under European standards (<strong>EUR-ACE and CTI</strong>), and complemented it with 
-                            multiple internships that gave me practical, hands-on experience. 
-                        </p>
-
-                        <p class="mb-4">
-                            Over the past few years, I have worked <strong> freelance with national and international companies,</strong> 
-                            delivering high-impact projects. On a national level, I created <strong>Tunisia’s first bulletproof 
-                            car brand website's </strong> and contributed to the <strong> first Tunisian startup creating a SaaS platform for sports academy management, </strong>
-                            featuring an AI mental health chatbot, livestream, and Power BI for accounting—already used by <strong> Club Africain, 
-                            one of Tunisia’s top clubs.</strong> while we gained clients on the international level such as <strong>Senegal, Libya, Morocco, UAE</strong>
-                            I have also created Saudi Arabian hotel agency web application management system to help them with booking and managing visitors and staff. 
-                            
-                        </p>
-                        <p>
-I thrive at the intersection of innovation 
-                            and real-world impact, building solutions that combine cutting-edge technology with tangible results for clients across industries.                       
-                         </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills -->
-        <section id="skills" class="py-20">
-            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Technical Skills</h3>
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                <!-- Skill Example -->
-                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./js.png"></img>
-                    <span class="font-semibold">JavaScript</span>
-                </div>
-                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./ts.png"></img>
-                    <span class="font-semibold">TypeScript</span>
-                </div>
-                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./React.png"></img>
-                    <span class="font-semibold">React</span>
-                </div>
-                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./Node.png"></img>
-                    <span class="font-semibold">Node.js</span>
-                </div>
-                 <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./MySQL.png"></img>
-                    <span class="font-semibold">MySQL</span>
-                </div>
-                <div class="skill-card section-card p-6 rounded-lg flex flex-col items-center justify-center transition-all duration-300">
-                    <img class="w-16 h-16 mb-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" src="./mongo.png"></img>
-                    <span class="font-semibold">MongoDB</span>
-                </div>
-                <!-- Add more skills as needed -->
-            </div>
-             <p class="text-2xl font-bold mb-12 mt-10 text-center text-cyan-400">And more...</p>
-        </section>
-
-        <!-- Projects -->
-        <section id="projects" class="py-20">
-            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Freelance Projects</h3>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Project Example 1 -->
-                <div class="project-card section-card rounded-lg overflow-hidden group">
-                    <div class="relative">
-                        <video src="./pfe.mp4" class="w-full h-60 object-cover" controls>
-                    </div>
-                    <div class="p-6">
-                        <h4 class="text-xl font-bold mb-2 text-white">Sports Management Software</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Angular</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">SpringBoot</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Mysql</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Node.js</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Express.js</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">RedisDB</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">LiveStreaming</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">AI Chatbot</span>
-                            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Power BI</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Project Example 2 -->
-         <div class="project-card section-card rounded-lg overflow-hidden group">
-  <div class="relative">
-    <!-- Website Preview -->
-    <iframe 
-      src="https://hamilcar.tn" 
-      class="w-full h-60 object-cover"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-popups"
-    ></iframe>
-
-  </div>
-
-        <div class="p-6">
-        <h4 class="text-xl font-bold mb-2 text-white">
-        <a href="https://hamilcar.tn" target="_blank" rel="noopener noreferrer" class="hover:underline">
-            Bullet Proof Car Website
-        </a>
-        </h4>
-            <div class="flex flex-wrap gap-2">
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">CSS</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">JavaScript</span>
-            </div>
+          </div>
         </div>
-        </div>
+      </section>
 
-                <!-- Project Example 3 -->
-                <div class="project-card section-card rounded-lg overflow-hidden group">
-  <div class="relative">
-    <!-- Website Preview -->
-    <iframe 
-      src="https://smrpharmaplus.com" 
-      class="w-full h-60 object-cover"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-popups"
-    ></iframe>
+<section id="skills" class="py-20">
+  <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400 reveal">
+    Technical Skills
+  </h3>
 
-  </div>
-
-        <div class="p-6">
-        <h4 class="text-xl font-bold mb-2 text-white">
-        <a href="https://smrpharmaplus.com" target="_blank" rel="noopener noreferrer" class="hover:underline">
-            Pharmaceutical Laboratory Website
-        </a>
-        </h4>
-            <div class="flex flex-wrap gap-2">
-          <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">CSS</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">JavaScript</span>
-            </div>
-        </div>
-        </div>
-
-        <!-- project 4 -->
-         <div class="project-card section-card rounded-lg overflow-hidden group">
-  <div class="relative">
-    <!-- Website Preview -->
-    <iframe 
-      src="https://vehtun-web.vercel.app" 
-      class="w-full h-60 object-cover"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-popups"
-    ></iframe>
-
-  </div>
-
-        <div class="p-6">
-        <h4 class="text-xl font-bold mb-2 text-white">
-        <a href="https://vehtun-web.vercel.app" target="_blank" rel="noopener noreferrer" class="hover:underline">
-            Pharmaceutical Laboratory Website
-        </a>
-        </h4>
-            <div class="flex flex-wrap gap-2">
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">React</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">TypeScript</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">HTML</span>
-            </div>
-        </div>
-        </div>
-
- <!-- project 5 -->
-         <div class="project-card section-card rounded-lg overflow-hidden group">
-  <div class="relative">
-    <!-- Website Preview -->
-    <iframe 
-      src="https://ideal-bookings.com/" 
-      class="w-full h-60 object-cover"
-      loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-popups"
-    ></iframe>
-
-  </div>
-
-        <div class="p-6">
-        <h4 class="text-xl font-bold mb-2 text-white">
-        <a href="https://ideal-bookings.com/" target="_blank" rel="noopener noreferrer" class="hover:underline">
-            Pharmaceutical Laboratory Website
-        </a>
-        </h4>
-            <div class="flex flex-wrap gap-2">
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">NextJS</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Node.js</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">Express.js</span>
-            <span class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full">MySQL</span>
-            </div>
-        </div>
-        </div>
-
-        </section>
-
-        <!-- Experience -->
-        <section id="experience" class="py-20">
-            <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400">Experience</h3>
-            <div class="relative max-w-2xl mx-auto">
-                <div class="absolute left-0 top-0 h-full w-0.5 bg-cyan-500/30"></div>
-                <!-- Experience Item 1 -->
-                <div class="timeline-item relative pl-8 mb-12">
-                    <h4 class="font-bold text-xl text-white">Freelance Developer</h4>
-                    <p class="text-cyan-400 font-medium mb-2">Self-Employed | Dec 2024 - Present</p>
-                    <p class="text-gray-400">
-                        Designed and developed full-stack applications for various clients, focusing on performance, scalability, and modern UI/UX. Managed projects from initial consultation to final deployment and maintenance.
-                    </p>
-                </div>
-                <!-- Experience Item 2 -->
-                <div class="timeline-item relative pl-8 mb-12">
-                    <h4 class="font-bold text-xl text-white">Freelance Developer</h4>
-                    <p class="text-cyan-400 font-medium mb-2">Ideal Bookings | Sept 2024 - Dec 2024</p>
-                    <p class="text-gray-400">
-                    Developed a comprehensive web application for a Saudi Arabian hotel agency, enabling seamless booking management, visitor coordination, and staff operations.                    </p>
-                </div>
-                <!-- Experience Item 3 -->
-                <div class="timeline-item relative pl-8">
-                    <h4 class="font-bold text-xl text-white">Software Engineer Intern</h4>
-                    <p class="text-cyan-400 font-medium mb-2">GARK | Feb 2024 - Aug 2024</p>
-                    <p class="text-gray-400">
-                    Contributed to the first Tunisian startup creating a SaaS platform for sports academy management,
-                            featuring an AI mental health chatbot, livestream, and Power BI for accounting                
-                </div>
-            </div>
-        </section>
-
-      <!-- ✅ Contact Form -->
-         <section id="contact" class="py-20">
-             <div class="section-card p-8 md:p-12 rounded-2xl max-w-3xl mx-auto">
-                <h3 class="text-3xl font-bold mb-2 text-center text-cyan-400">Get In Touch</h3>
-                <p class="text-center text-gray-400 mb-8">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
-<form id="cta-form" action="https://api.web3forms.com/submit" method="POST">
-        <input type="hidden" name="access_key" value="251a6a2b-26a2-4836-8ea9-602372e5968c">
-
-  <div class="mb-6">
-    <label for="name" class="block mb-2 text-sm font-medium text-gray-300">Your Name</label>
-    <input type="text" id="name" name="name" required
-      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
-      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5">
-  </div>
-  <div class="mb-6">
-    <label for="email" class="block mb-2 text-sm font-medium text-gray-300">Your Email</label>
-    <input type="email" id="email" name="email" required
-      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
-      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5">
-  </div>
-  <div class="mb-6">
-    <label for="message" class="block mb-2 text-sm font-medium text-gray-300">Message</label>
-    <textarea id="message" name="message" rows="4" required
-      class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg 
-      focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5"></textarea>
-  </div>
-  <div class="text-center">
-    <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 
-      hover:to-blue-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 
-      transform hover:scale-105 shadow-lg shadow-cyan-500/30">
-      Send Message
-    </button>
-  </div>
-</form>
- </div>
-        </section>
-<!-- ✅ Modal -->
-<div id="modal-overlay" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center">
-  <div class="bg-gray-900 p-8 rounded-xl shadow-lg max-w-sm w-full text-center relative">
-    <button id="close-modal-btn" class="absolute top-2 right-4 text-white text-2xl">&times;</button>
-    <div class="mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
-        stroke="green" class="w-12 h-12 mx-auto">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M9 12l2 2l4-4m6 2a9 9 0 11-18 0a9 9 0 0118 0z"/>
-      </svg>
+  <div
+    class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"
+  >
+    <!-- JavaScript -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-yellow-400/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./js.png" alt="JavaScript Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">JavaScript</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Frontend Language</p>
     </div>
-    <h3 class="text-xl font-bold text-green-400">Success!</h3>
-    <p class="text-gray-300 mt-2">Your message has been sent successfully.<br />We'll be in touch shortly.</p>
+
+    <!-- TypeScript -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./ts.png" alt="TypeScript Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">TypeScript</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Typed JavaScript</p>
+    </div>
+
+    <!-- React -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-cyan-400/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./React.png" alt="React Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">React</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">UI Library</p>
+    </div>
+
+    <!-- Node.js -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-green-500/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./Node.png" alt="Node.js Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">Node.js</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Backend Runtime</p>
+    </div>
+
+    <!-- MySQL -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-blue-300/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./MySQL.png" alt="MySQL Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">MySQL</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">SQL Database</p>
+    </div>
+
+    <!-- MongoDB -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-green-500/30 reveal group"
+    >
+      <img class="w-38 h-38 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./mongo.png" alt="MongoDB Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">MongoDB</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">NoSQL Database</p>
+    </div>
+
+    <!-- Angular -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-red-400/30 reveal group"
+    >
+      <img class="w-16 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./angular.png" alt="Angular Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">Angular</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Frontend Framework</p>
+    </div>
+
+    <!-- SpringBoot -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-green-400/30 reveal group"
+    >
+      <img class="w-24 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6 bg-black p-1 rounded" 
+           src="./sprg.png" alt="SpringBoot Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">SpringBoot</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Java Framework</p>
+    </div>
+
+    <!-- ExpressJS -->
+    <div
+      class="skill-card section-card p-6 rounded-2xl flex flex-col items-center justify-center 
+             transition-all duration-300 transform bg-gradient-to-b from-gray-900 to-black 
+             hover:scale-105 hover:shadow-lg hover:shadow-gray-400/30 reveal group"
+    >
+      <img class="w-32 h-16 mb-3 transition-transform duration-300 group-hover:rotate-6" 
+           src="./express.png" alt="ExpressJS Icon" />
+      <span class="font-semibold text-white text-lg tracking-wide">ExpressJS</span>
+      <p class="text-sm text-gray-400 mt-2 text-center">Node.js Framework</p>
+    </div>
   </div>
-</div>
+
+  <p class="text-2xl font-bold mb-12 mt-10 text-center text-cyan-400 reveal">
+    And more...
+  </p>
+</section>
+
+
+      <section id="projects" class="py-20">
+        <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400 reveal">
+          Professional Projects
+        </h3>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            class="project-card section-card rounded-lg overflow-hidden group reveal"
+          >
+            <div class="relative">
+              <video
+                src="./pfe.mp4"
+                class="w-full h-60 object-cover"
+                controls
+              ></video>
+            </div>
+            <div class="p-6">
+              <h4 class="text-xl font-bold mb-2 text-white">
+                Sports Management Software
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >Angular</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >SpringBoot</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >MySQL</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >RedisSB</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >LiveStreaming</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >AI Chatbot</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >Power BI</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            class="project-card section-card rounded-lg overflow-hidden group reveal"
+          >
+            <div class="relative">
+              <iframe
+                src="https://hamilcar.tn"
+                class="w-full h-60 object-cover"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              ></iframe>
+            </div>
+            <div class="p-6">
+              <h4 class="text-xl font-bold mb-2 text-white">
+                <a
+                  href="https://hamilcar.tn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:underline"
+                  >Tunisian 1st Bullet Proof Car Website</a
+                >
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >HTML</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >CSS</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >JavaScript</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            class="project-card section-card rounded-lg overflow-hidden group reveal"
+          >
+            <div class="relative">
+              <iframe
+                src="https://smrpharmaplus.com"
+                class="w-full h-60 object-cover"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              ></iframe>
+            </div>
+            <div class="p-6">
+              <h4 class="text-xl font-bold mb-2 text-white">
+                <a
+                  href="https://smrpharmaplus.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:underline"
+                  >Pharmaceutical Laboratory Website</a
+                >
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >HTML</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >CSS</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >JavaScript</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            class="project-card section-card rounded-lg overflow-hidden group reveal"
+          >
+            <div class="relative">
+              <iframe
+                src="https://vehtun-web.vercel.app"
+                class="w-full h-60 object-cover"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              ></iframe>
+            </div>
+            <div class="p-6">
+              <h4 class="text-xl font-bold mb-2 text-white">
+                <a
+                  href="https://vehtun-web.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:underline"
+                  >Vehicles Custom Equipment Manufacturing Website</a
+                >
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >React</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >TypeScript</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            class="project-card section-card rounded-lg overflow-hidden group reveal"
+          >
+            <div class="relative">
+              <iframe
+                src="https://ideal-bookings.com/"
+                class="w-full h-60 object-cover"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              ></iframe>
+            </div>
+            <div class="p-6">
+              <h4 class="text-xl font-bold mb-2 text-white">
+                <a
+                  href="https://ideal-bookings.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:underline"
+                  >Hotel Management System</a
+                >
+              </h4>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >NextJS</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >Node.js</span
+                >
+                <span
+                  class="bg-cyan-900/50 text-cyan-300 text-xs font-semibold px-2.5 py-1 rounded-full"
+                  >MySQL</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="experience" class="py-20">
+        <h3 class="text-3xl font-bold mb-12 text-center text-cyan-400 reveal">
+          Experience
+        </h3>
+        <div class="relative max-w-2xl mx-auto">
+          <div class="absolute left-0 top-0 h-full w-0.5 bg-cyan-500/30"></div>
+          <div class="timeline-item relative pl-8 mb-12 reveal">
+            <h4 class="font-bold text-xl text-white">Freelance Engineer</h4>
+            <p class="text-cyan-400 font-medium mb-2">
+              Self-Employed | Dec 2024 - Present
+            </p>
+            <p class="text-gray-400">
+              Designed and developed full-stack applications for various
+              clients, focusing on performance, scalability, and modern UI/UX.
+              Managed projects from initial consultation to final deployment and
+              maintenance.
+            </p>
+          </div>
+          <div class="timeline-item relative pl-8 mb-12 reveal">
+            <h4 class="font-bold text-xl text-white">Freelance Engineer</h4>
+            <p class="text-cyan-400 font-medium mb-2">
+              Ideal Bookings | Sept 2024 - Dec 2024
+            </p>
+            <p class="text-gray-400">
+              Developed a comprehensive web application for a Saudi Arabian
+              hotel agency, enabling seamless booking management, visitor
+              coordination, and staff operations.
+            </p>
+          </div>
+          <div class="timeline-item relative pl-8 reveal">
+            <h4 class="font-bold text-xl text-white">
+              Software Engineer Intern
+            </h4>
+            <p class="text-cyan-400 font-medium mb-2">
+              GARK | Feb 2024 - Aug 2024
+            </p>
+            <p class="text-gray-400">
+              Contributed to the first Tunisian startup creating a SaaS platform
+              for sports academy management, featuring an AI mental health
+              chatbot, livestream, and Power BI for accounting.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="py-20">
+        <div
+          class="section-card p-8 md:p-12 rounded-2xl max-w-3xl mx-auto reveal"
+        >
+          <h3 class="text-3xl font-bold mb-2 text-center text-cyan-400">
+            Get In Touch
+          </h3>
+          <p class="text-center text-gray-400 mb-8">
+            Have a project in mind or just want to say hello? I'd love to hear
+            from you.
+          </p>
+          <form
+            id="cta-form"
+            action="https://api.web3forms.com/submit"
+            method="POST"
+          >
+            <input
+              type="hidden"
+              name="access_key"
+              value="251a6a2b-26a2-4836-8ea9-602372e5968c"
+            />
+            <div class="mb-6">
+              <label
+                for="name"
+                class="block mb-2 text-sm font-medium text-gray-300"
+                >Your Name</label
+              >
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5"
+              />
+            </div>
+            <div class="mb-6">
+              <label
+                for="email"
+                class="block mb-2 text-sm font-medium text-gray-300"
+                >Your Email</label
+              >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5"
+              />
+            </div>
+            <div class="mb-6">
+              <label
+                for="message"
+                class="block mb-2 text-sm font-medium text-gray-300"
+                >Message</label
+              >
+              <textarea
+                id="message"
+                name="message"
+                rows="4"
+                required
+                class="bg-gray-900/50 border border-gray-700 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block w-full p-2.5"
+              ></textarea>
+            </div>
+            <div class="text-center">
+              <button
+                type="submit"
+                class="animated-gradient bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg shadow-cyan-500/30 hover:shadow-blue-500/40"
+              >
+                Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div
+        id="modal-overlay"
+        class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50"
+      >
+        <div
+          class="bg-gray-900 p-8 rounded-xl shadow-lg max-w-sm w-full text-center relative border border-green-500/30"
+        >
+          <button
+            id="close-modal-btn"
+            class="absolute top-2 right-4 text-white text-2xl"
+          >
+            &times;
+          </button>
+          <div class="mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-12 h-12 mx-auto text-green-400"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2l4-4m6 2a9 9 0 11-18 0a9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-green-400">Success!</h3>
+          <p class="text-gray-300 mt-2">
+            Your message has been sent successfully.<br />We'll be in touch
+            shortly.
+          </p>
+        </div>
+      </div>
     </main>
 
-    <!-- Footer -->
     <footer class="border-t border-cyan-500/20 mt-20">
-        <div class="container mx-auto px-6 py-6 text-center text-gray-500">
-            <p>&copy; 2025 Amen JOUINI. All Rights Reserved.</p>
-        </div>
+      <div class="container mx-auto px-6 py-6 text-center text-gray-500">
+        <p>&copy; 2025 Amen JOUINI. All Rights Reserved.</p>
+      </div>
     </footer>
 
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
         // Background Animation with Three.js
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        const renderer = new THREE.WebGLRenderer({
+          canvas: document.getElementById("bg-canvas"),
+          alpha: true,
+        });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        const particlesGeometry = new THREE.BufferGeometry;
-        const particlesCount = 5000;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 7000; // Increased particle count
         const posArray = new Float32Array(particlesCount * 3);
-
         for (let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 5;
+          posArray[i] = (Math.random() - 0.5) * 10; // Wider particle distribution
         }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(posArray, 3)
+        );
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.005,
-            color: 0x00aaff
+          size: 0.006,
+          color: 0x00aaff,
         });
 
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        const particlesMesh = new THREE.Points(
+          particlesGeometry,
+          particlesMaterial
+        );
         scene.add(particlesMesh);
         camera.position.z = 2;
 
         let mouseX = 0;
         let mouseY = 0;
-        document.addEventListener('mousemove', (event) => {
-            mouseX = event.clientX;
-            mouseY = event.clientY;
+        document.addEventListener("mousemove", (event) => {
+          mouseX = event.clientX - window.innerWidth / 2;
+          mouseY = event.clientY - window.innerHeight / 2;
         });
 
         const clock = new THREE.Clock();
         const animate = () => {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            particlesMesh.rotation.y = -0.1 * elapsedTime;
-            if (mouseX > 0) {
-                particlesMesh.rotation.x = -mouseY * (elapsedTime * 0.00008);
-                particlesMesh.rotation.y = -mouseX * (elapsedTime * 0.00008);
-            }
-            renderer.render(scene, camera);
+          requestAnimationFrame(animate);
+          const elapsedTime = clock.getElapsedTime();
+          particlesMesh.rotation.y = -0.05 * elapsedTime;
+
+          // Smoother mouse follow
+          particlesMesh.rotation.x +=
+            (-mouseY * 0.00005 - particlesMesh.rotation.x) * 0.05;
+          particlesMesh.rotation.y +=
+            (mouseX * 0.00005 - particlesMesh.rotation.y) * 0.05;
+
+          renderer.render(scene, camera);
         };
         animate();
 
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+        window.addEventListener("resize", () => {
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
         });
 
         // Header scroll effect
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                header.classList.add('bg-black/50', 'backdrop-blur-xl', 'shadow-lg');
-            } else {
-                header.classList.remove('bg-black/50', 'backdrop-blur-xl', 'shadow-lg');
-            }
+        const header = document.getElementById("header");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 50) {
+            header.classList.add(
+              "bg-black/70",
+              "backdrop-blur-xl",
+              "shadow-lg"
+            );
+          } else {
+            header.classList.remove(
+              "bg-black/70",
+              "backdrop-blur-xl",
+              "shadow-lg"
+            );
+          }
         });
 
         // Mobile menu toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuButton.addEventListener("click", () => {
+          mobileMenu.classList.toggle("hidden");
         });
-        
-        // Close mobile menu on link click
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
+        document.querySelectorAll("#mobile-menu a").forEach((link) => {
+          link.addEventListener("click", () => {
+            mobileMenu.classList.add("hidden");
+          });
         });
+
+        // Form Success Modal Logic
         const modalOverlay = document.getElementById("modal-overlay");
-  const closeModalBtn = document.getElementById("close-modal-btn");
-  const form = document.getElementById("cta-form");
+        const closeModalBtn = document.getElementById("close-modal-btn");
+        const form = document.getElementById("cta-form");
 
-  function showSuccessModal() {
-    modalOverlay.classList.remove("hidden");
-  }
-  function hideSuccessModal() {
-    modalOverlay.classList.add("hidden");
-  }
+        function showSuccessModal() {
+          modalOverlay.classList.remove("hidden");
+        }
+        function hideSuccessModal() {
+          modalOverlay.classList.add("hidden");
+        }
 
-  if (closeModalBtn) {
-    closeModalBtn.addEventListener("click", hideSuccessModal);
-  }
-  if (modalOverlay) {
-    modalOverlay.addEventListener("click", (e) => {
-      if (e.target === modalOverlay) hideSuccessModal();
-    });
-  }
+        if (closeModalBtn) {
+          closeModalBtn.addEventListener("click", hideSuccessModal);
+        }
+        if (modalOverlay) {
+          modalOverlay.addEventListener("click", (e) => {
+            if (e.target === modalOverlay) hideSuccessModal();
+          });
+        }
 
-  // ✅ Handle Form Submit
-  form.addEventListener("submit", function(event) {
-    event.preventDefault();
-    const formData = new FormData(form);
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          const formData = new FormData(form);
+          fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: { Accept: "application/json" },
+          })
+            .then((res) => {
+              if (!res.ok) throw new Error("Form submit failed");
+              showSuccessModal();
+              form.reset();
+            })
+            .catch(() => alert("Something went wrong. Please try again."));
+        });
 
-    fetch(form.action, {
-      method: "POST",
-      body: formData,
-      headers: { Accept: "application/json" }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("Form submit failed");
-      showSuccessModal();
-      form.reset();
-    })
-    .catch(() => alert("Something went wrong. Please try again."));
-  });
+        // --- NEW: Typing Effect ---
+        const typingElement = document.getElementById("typing-effect");
+        const words = [
+          "Software Engineer ",
+          "IT Architect ",
+          "Full-Stack Developer ",
+          "SaaS Specialist ",
+        ];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
 
+        function type() {
+          const currentWord = words[wordIndex];
+          const typeSpeed = isDeleting ? 75 : 150;
 
+          typingElement.textContent = currentWord.substring(0, charIndex);
+
+          if (!isDeleting && charIndex < currentWord.length) {
+            charIndex++;
+          } else if (isDeleting && charIndex > 0) {
+            charIndex--;
+          } else {
+            isDeleting = !isDeleting;
+            if (!isDeleting) {
+              wordIndex = (wordIndex + 1) % words.length;
+            }
+          }
+
+          let delay = typeSpeed;
+          if (!isDeleting && charIndex === currentWord.length) {
+            delay = 2000; // Pause at end of word
+          }
+          setTimeout(type, delay);
+        }
+        type();
+
+        // --- NEW: Scroll Animation Logic ---
+        const revealElements = document.querySelectorAll(".reveal");
+        const observerOptions = {
+          root: null,
+          rootMargin: "0px",
+          threshold: 0.1,
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+          entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+              // Apply a staggered delay based on the element's index in the nodelist
+              const delay =
+                entry.target.style.transitionDelay || (index % 6) * 100 + "ms";
+              entry.target.style.transitionDelay = delay;
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target); // Stop observing after it's visible
+            }
+          });
+        }, observerOptions);
+
+        revealElements.forEach((el, index) => {
+          // Stagger children inside a container
+          if (
+            el.parentElement.classList.contains("grid") ||
+            el.parentElement.classList.contains("timeline-item")
+          ) {
+            el.style.transitionDelay = `${index * 100}ms`;
+          }
+          observer.observe(el);
+        });
+      });
     </script>
-</body>
+  </body>
 </html>

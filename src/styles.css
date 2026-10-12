@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --paper: 242 238 229;
+    --raised: 250 248 243;
+    --ink: 20 19 16;
+    --muted: 104 100 88;
+    --signal: 226 68 27;
+    --signal-deep: 178 48 14;
+    --nav-h: 4.5rem;
+  }
+
+  /* Inverted surface: any block with .surface-ink flips the same tokens. */
+  .surface-ink {
+    --paper: 20 19 16;
+    --raised: 31 30 26;
+    --ink: 242 238 229;
+    --muted: 168 163 150;
+    --signal: 240 92 50;
+    --signal-deep: 245 126 90;
+    @apply bg-paper text-ink;
+  }
+
+  * {
+    @apply border-line;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply overflow-x-hidden bg-paper font-sans text-ink antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  section[id] {
+    scroll-margin-top: var(--nav-h);
+  }
+
+  ::selection {
+    @apply bg-signal text-white;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-signal ring-offset-2 ring-offset-paper;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Type scale */
+  .display-xl {
+    @apply font-display font-semibold;
+    font-size: clamp(2.85rem, 9.4vw, 9.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+  }
+
+  .display-lg {
+    @apply font-display font-semibold;
+    font-size: clamp(2.25rem, 5.6vw, 5rem);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+  }
+
+  .display-md {
+    @apply font-display font-semibold;
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .accent-serif {
+    @apply font-serif font-normal italic text-signal;
+    letter-spacing: -0.02em;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[0.6875rem] uppercase leading-none tracking-[0.14em] text-muted;
+  }
+
+  .lede {
+    @apply text-lg leading-relaxed text-ink/80 md:text-xl md:leading-relaxed;
+  }
+
+  /* Inline link whose underline slides out on hover */
+  .link-rule {
+    @apply relative inline-flex items-center gap-1.5 pb-0.5;
+    background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+    transition:
+      background-size 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.2s;
+  }
+
+  .link-rule:hover {
+    background-size: 0 1px;
+    background-position: 100% 100%;
+    @apply text-signal-deep;
+  }
+
+  /* Stack label */
+  .chip {
+    @apply inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[0.6875rem] leading-none tracking-wide text-ink/80;
+  }
+
+  /* Drafting-paper grid behind the hero */
+  .blueprint {
+    background-image:
+      linear-gradient(to right, rgb(var(--ink) / 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--ink) / 0.055) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(120% 90% at 70% 10%, #000 20%, transparent 78%);
+  }
+
+  /* Dashed connector between pipeline steps; the dashes travel in the data's direction */
+  .pipeline-link {
+    background-image: linear-gradient(180deg, rgb(var(--ink) / 0.45) 50%, transparent 50%);
+    background-size: 100% 8px;
+    animation: pipeline-flow-y 0.9s linear infinite;
+  }
+
+  @media (min-width: 768px) {
+    .pipeline-link {
+      background-image: linear-gradient(90deg, rgb(var(--ink) / 0.45) 50%, transparent 50%);
+      background-size: 8px 100%;
+      animation-name: pipeline-flow-x;
+    }
+  }
+
+  @keyframes pipeline-flow-x {
+    to {
+      background-position-x: 8px;
+    }
+  }
+
+  @keyframes pipeline-flow-y {
+    to {
+      background-position-y: 8px;
+    }
+  }
+
+  /* Country strip: fades at both edges, loops by sliding half its (duplicated) width */
+  .marquee {
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee-track {
+    animation: marquee 32s linear infinite;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Corner registration marks */
+  .crop-marks {
+    @apply relative;
+  }
+
+  .crop-marks::before,
+  .crop-marks::after {
+    content: "";
+    @apply pointer-events-none absolute h-3 w-3 border-ink/50;
+  }
+
+  .crop-marks::before {
+    @apply -left-2 -top-2 border-l border-t;
+  }
+
+  .crop-marks::after {
+    @apply -bottom-2 -right-2 border-b border-r;
+  }
+}
+
+/* react-day-picker theme */
+.rdp-root {
+  --rdp-accent-color: rgb(var(--signal));
+  --rdp-accent-background-color: rgb(var(--signal) / 0.12);
+  --rdp-day-height: 2.25rem;
+  --rdp-day-width: 2.25rem;
+  --rdp-day_button-height: 2.125rem;
+  --rdp-day_button-width: 2.125rem;
+  --rdp-today-color: rgb(var(--signal-deep));
+}

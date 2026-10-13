@@ -14,6 +14,7 @@ export function GarkCase({ onPreview }) {
   return (
     <MotionReveal
       as={motion.article}
+      id="case-gark"
       className="surface-ink -mx-5 overflow-hidden px-5 py-12 sm:-mx-8 sm:px-8 md:py-16 lg:mx-0 lg:rounded-[2rem] lg:p-16"
     >
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">

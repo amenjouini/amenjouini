@@ -1,3 +1,4 @@
+import { FloatingCta } from "@/components/FloatingCta";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { AboutSection } from "@/components/sections/AboutSection";
@@ -20,6 +21,7 @@ export default function Home() {
         <ContactSection />
       </main>
       <Footer />
+      <FloatingCta />
     </div>
   );
 }
